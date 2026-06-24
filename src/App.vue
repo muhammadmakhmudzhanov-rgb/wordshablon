@@ -5,51 +5,91 @@ import Docxtemplater from 'docxtemplater'
 import { saveAs } from 'file-saver'
 import { renderAsync } from 'docx-preview'
 
+const surname = ref('')
+const name = ref('')
+const patronymic = ref('')
+const citizenship = ref('')
 const isLoaded = ref(false)
 const preview = ref(null)
+
+
 const fields = ref([])
 const formData = ref({})
 
 let templateBuffer = null
 
 const updatePreview = async () => {
+    console.log('updatePreview работает')
   if (!templateBuffer || !preview.value) return
 
   const zip = new PizZip(templateBuffer)
+
   const doc = new Docxtemplater(zip)
+
   doc.render(formData.value)
 
   const blob = doc.getZip().generate({
     type: 'blob',
-    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    mimeType:
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   })
 
   preview.value.innerHTML = ''
+
   await renderAsync(blob, preview.value)
+  console.log(preview.value.innerHTML)
+
+  preview.value.contentEditable = true
 }
 
 const generateDoc = async () => {
-  // Берём текущий отрендеренный docx (с подставленными полями)
+  console.log(formData.value)
   const zip = new PizZip(templateBuffer)
+
   const doc = new Docxtemplater(zip)
+
   doc.render(formData.value)
 
-  // Получаем XML документа
-  const renderedZip = doc.getZip()
-
-  // Заменяем текст в XML на основе изменений в preview
-  const xmlContent = renderedZip.files['word/document.xml'].asText()
-  
-  // Применяем правки из contenteditable
-  const editedXml = applyPreviewEdits(xmlContent)
-  renderedZip.file('word/document.xml', editedXml)
-
-  const blob = renderedZip.generate({
+  const blob = doc.getZip().generate({
     type: 'blob',
-    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    mimeType:
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   })
 
   saveAs(blob, 'document.docx')
+}
+const uploadTemplate = async (event) => {
+  const file = event.target.files[0]
+
+  if (!file) return
+
+  templateBuffer = await file.arrayBuffer()
+
+  const zip = new PizZip(templateBuffer)
+
+  const xml = zip.files['word/document.xml'].asText()
+
+  const matches = [
+    ...new Set(
+      [...xml.matchAll(/\{([^}]+)\}/g)].map(
+        match => match[1]
+      )
+    ),
+  ]
+
+  fields.value = matches
+
+  formData.value = {}
+
+  matches.forEach(field => {
+    formData.value[field] = ''
+  })
+
+  isLoaded.value = true
+
+  await nextTick()
+
+  await updatePreview()
 }
 </script>
 
