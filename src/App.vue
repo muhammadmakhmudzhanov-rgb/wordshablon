@@ -19,6 +19,7 @@ const formData = ref({})
 let templateBuffer = null
 
 const updatePreview = async () => {
+    console.log('updatePreview работает')
   if (!templateBuffer || !preview.value) return
 
   const zip = new PizZip(templateBuffer)
