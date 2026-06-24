@@ -36,6 +36,8 @@ const updatePreview = async () => {
   preview.value.innerHTML = ''
 
   await renderAsync(blob, preview.value)
+
+  preview.value.contentEditable = true
 }
 
 const generateDoc = async () => {
@@ -106,21 +108,17 @@ const uploadTemplate = async (event) => {
   </div>
 </div>
 
-  <div v-else class="wrapper">
-    <div class="form">
-      <h2>Заполнение</h2>
+<div v-else class="wrapper">
+  <button class="save-btn" @click="generateDoc">
+    Скачать Word
+  </button>
 
-      <div v-for="field in fields" :key="field">
-        <input v-model="formData[field]" @input="updatePreview" :placeholder="field">
-      </div>
-
-      <button @click="generateDoc">
-        Скачать Word
-      </button>
-    </div>
-
-    <div ref="preview" class="preview"></div>
-  </div>
+  <div
+    ref="preview"
+    class="preview"
+    contenteditable="true"
+  ></div>
+</div>
 </template>
 
 <style>
@@ -291,5 +289,26 @@ body {
 
 .upload-btn input {
   display: none;
+}
+
+.wrapper {
+  padding: 30px;
+}
+
+.save-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+
+  padding: 12px 20px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+  z-index: 999;
 }
 </style>
