@@ -36,6 +36,7 @@ const updatePreview = async () => {
   preview.value.innerHTML = ''
 
   await renderAsync(blob, preview.value)
+  console.log(preview.value.innerHTML)
 
   preview.value.contentEditable = true
 }
