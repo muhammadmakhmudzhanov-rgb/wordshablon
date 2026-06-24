@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, nextTick } from 'vue'
 import PizZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
 import { saveAs } from 'file-saver'
@@ -84,41 +84,35 @@ const uploadTemplate = async (event) => {
 
   isLoaded.value = true
 
+  await nextTick()
+
   await updatePreview()
 }
 </script>
 
 <template>
-<div v-if="!isLoaded" class="empty">
-  <div class="upload-card">
-    <h1>📄 Конструктор документов</h1>
+  <div v-if="!isLoaded" class="empty">
+    <div class="upload-card">
+      <h1>📄 Конструктор документов</h1>
 
-    <p>
-      Загрузите Word шаблон (.docx)
-    </p>
+      <p>
+        Загрузите Word шаблон (.docx)
+      </p>
 
-    <label class="upload-btn">
-      Выбрать файл
-      <input
-        type="file"
-        accept=".docx"
-        @change="uploadTemplate"
-      >
-    </label>
+      <label class="upload-btn">
+        Выбрать файл
+        <input type="file" accept=".docx" @change="uploadTemplate">
+      </label>
+    </div>
   </div>
-</div>
 
-<div v-else class="wrapper">
-  <button class="save-btn" @click="generateDoc">
-    Скачать Word
-  </button>
+  <div v-else class="wrapper">
+    <button class="save-btn" @click="generateDoc">
+      Скачать Word
+    </button>
 
-  <div
-    ref="preview"
-    class="preview"
-    contenteditable="true"
-  ></div>
-</div>
+    <div ref="preview" class="preview" contenteditable="true"></div>
+  </div>
 </template>
 
 <style>
@@ -212,7 +206,7 @@ body {
   padding: 60px;
 
   box-shadow:
-    0 0 20px rgba(0,0,0,.2);
+    0 0 20px rgba(0, 0, 0, .2);
 
   border: 1px solid #e5e7eb;
 }
@@ -233,11 +227,9 @@ body {
   justify-content: center;
   align-items: center;
 
-  background: linear-gradient(
-    135deg,
-    #eef2ff,
-    #f8fafc
-  );
+  background: linear-gradient(135deg,
+      #eef2ff,
+      #f8fafc);
 }
 
 .upload-card {
@@ -252,7 +244,7 @@ body {
   text-align: center;
 
   box-shadow:
-    0 20px 40px rgba(0,0,0,.08);
+    0 20px 40px rgba(0, 0, 0, .08);
 }
 
 .upload-card h1 {
