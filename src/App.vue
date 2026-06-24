@@ -43,6 +43,7 @@ const updatePreview = async () => {
 }
 
 const generateDoc = async () => {
+  console.log(formData.value)
   const zip = new PizZip(templateBuffer)
 
   const doc = new Docxtemplater(zip)
