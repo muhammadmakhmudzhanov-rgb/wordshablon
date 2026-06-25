@@ -4,17 +4,9 @@ import PizZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
 import { saveAs } from 'file-saver'
 import { renderAsync } from 'docx-preview'
-
-const surname = ref('')
-const name = ref('')
-const patronymic = ref('')
-const citizenship = ref('')
-const isLoaded = ref(false)
-const preview = ref(null)
+import HTMLtoDOCX from 'html-docx-js-typescript'
 
 
-const fields = ref([])
-const formData = ref({})
 
 let templateBuffer = null
 
@@ -26,7 +18,11 @@ const updatePreview = async () => {
 
   const doc = new Docxtemplater(zip)
 
-  doc.render(formData.value)
+  try {
+  doc.render()
+} catch (e) {
+  console.error(e)
+}
 
   const blob = doc.getZip().generate({
     type: 'blob',
@@ -43,18 +39,21 @@ const updatePreview = async () => {
 }
 
 const generateDoc = async () => {
-  console.log(formData.value)
-  const zip = new PizZip(templateBuffer)
+  if (!preview.value) return
 
-  const doc = new Docxtemplater(zip)
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body>
+        ${preview.value.innerHTML}
+      </body>
+    </html>
+  `
 
-  doc.render(formData.value)
-
-  const blob = doc.getZip().generate({
-    type: 'blob',
-    mimeType:
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  })
+  const blob = await HTMLtoDOCX(html)
 
   saveAs(blob, 'document.docx')
 }
