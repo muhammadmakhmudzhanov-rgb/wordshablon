@@ -6,7 +6,16 @@ import { saveAs } from 'file-saver'
 import { renderAsync } from 'docx-preview'
 import HTMLtoDOCX from 'html-docx-js-typescript'
 
+const surname = ref('')
+const name = ref('')
+const patronymic = ref('')
+const citizenship = ref('')
+const isLoaded = ref(false)
+const preview = ref(null)
 
+
+const fields = ref([])
+const formData = ref({})
 
 let templateBuffer = null
 
@@ -18,11 +27,7 @@ const updatePreview = async () => {
 
   const doc = new Docxtemplater(zip)
 
-  try {
-  doc.render()
-} catch (e) {
-  console.error(e)
-}
+  doc.render(formData.value)
 
   const blob = doc.getZip().generate({
     type: 'blob',
